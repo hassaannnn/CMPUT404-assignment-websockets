@@ -54,7 +54,7 @@ function drawCircle(context,entity) {
         //moveTo(x,y);
         fillStyle = entity["colour"];
         strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:100, 33, 2 * Math.PI, true);  
+        arc(x, y, (entity["radius"])?entity["radius"]:100, 31.4, 1.98 * Math.PI, true);  
         stroke();                                
     }
 }
@@ -123,9 +123,10 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    drawNextFrame(); // (but should we?)
-    let msg = JSON.stringify({"entity":data});
-    socket.send(msg);
+    // drawNextFrame(); // (but should we?)
+    let newEntities = {};
+    newEntities[entity] = data;
+    socket.send(JSON.stringify(newEntities));
     //XXX: Send a XHTML Request that updates the entity you just modified!
 }
 var counter = 0;
@@ -233,16 +234,16 @@ mouse = (function() {
 // Add the application specific mouse listeners!
 //XXX: TODO Make these prettier!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'#d47459', 'radius':88});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#EE6352', 'radius':84.6});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'#55501a', 'radius':6});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#3FA7D6', 'radius':5.8});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    addEntityWithoutName({'x':x,'y':y,'colour':'#4c271b',
-                          'radius':33});
+    addEntityWithoutName({'x':x,'y':y,'colour':'#FAC05E',
+                          'radius':31.7});
 });
 
 
@@ -257,6 +258,14 @@ function wsSetup() {
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
         console.log("Successfully connected to WS")
+        wscounter+=1;
+        fetch('/world')
+  .then((response) => response.json())
+  .then((data) => {
+    world = data;
+    drawNextFrame();
+    drawFrame();
+  });
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
